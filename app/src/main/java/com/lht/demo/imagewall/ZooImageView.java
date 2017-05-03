@@ -1,7 +1,9 @@
 package com.lht.demo.imagewall;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.support.annotation.Nullable;
@@ -144,6 +146,10 @@ public class ZooImageView extends View {
         this.mBitmap = mBitmap;
     }
 
+    public void setmBitmap(Resources resources, int id) {
+        this.mBitmap=BitmapFactory.decodeResource(resources,id);
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
@@ -213,7 +219,6 @@ public class ZooImageView extends View {
                         invalidate();
                         lastFingerDis = fingerDis;
                     }
-
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
@@ -243,13 +248,17 @@ public class ZooImageView extends View {
         switch (currentStatus) {
             case STATUS_ZOOM_OUT:
             case STATUS_ZOOM_IN:
-
+                zoom(canvas);
+                break;
+            case STATUS_MOVE:
+                move(canvas);
+                break;
+            case STATUS_INIT:
+                initBitmap(canvas);
+            default:
+                canvas.drawBitmap(mBitmap, matrix, null);
+                break;
         }
-
-
-
-
-
     }
 
     /**
@@ -297,9 +306,6 @@ public class ZooImageView extends View {
         currentBitmapWidth = scaledWidth;
         currentBitmapheight = scaledHeight;
         canvas.drawBitmap(mBitmap, matrix, null);
-
-
-
     }
 
     /**
@@ -308,7 +314,6 @@ public class ZooImageView extends View {
      * @param canvas
      */
     private void move(Canvas canvas) {
-
         matrix.reset();
         //根据手指移动的距离计算出总偏移量
         float translateX = totalTranslateX + movedDistanceX;
@@ -320,7 +325,6 @@ public class ZooImageView extends View {
         totalTranslateX = translateX;
         totalTranslateY = translateY;
         canvas.drawBitmap(mBitmap, matrix, null);
-
     }
 
 
@@ -350,10 +354,8 @@ public class ZooImageView extends View {
                     totalTranslateX = translateX;
                     totalRatio = initRatio = ratio;
                 }
-
                 currentBitmapheight = bitmapheight * initRatio;
                 currentBitmapWidth = bitmapWidth * initRatio;
-
             } else {
                 //当图片宽高都小于屏幕宽高时，直接让图片居中显示
                 float translateX = (width - mBitmap.getWidth()) / 2f;
@@ -380,11 +382,9 @@ public class ZooImageView extends View {
      * @return 两手指之间的距离
      */
     private double distanceBetweenFingers(MotionEvent event) {
-
         float disX = Math.abs(event.getX(0) - event.getX(1));
         float disY = Math.abs(event.getY(0) - event.getY(1));
         return Math.sqrt(disX * disX + disY * disY);
-
     }
 
 
@@ -395,6 +395,5 @@ public class ZooImageView extends View {
         float yPoint1 = event.getY(1);
         centerPointX = (xPoint0 + xPoint1) / 2;
         centerPointY = (yPoint0 + yPoint1) / 2;
-
     }
 }

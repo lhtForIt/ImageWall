@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
         zooImageView = (ZooImageView) findViewById(R.id.ziv);
 
+        zooImageView.setmBitmap(getResources(), R.mipmap.buty);
 
 
     }
